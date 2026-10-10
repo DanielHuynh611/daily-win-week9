@@ -1,0 +1,1 @@
+window.ZorentiaUI.mount({"screen_route":"/","actions":[],"storage_key":"zorentia-app:b203da38a9bce731d379b51c:access-token"});

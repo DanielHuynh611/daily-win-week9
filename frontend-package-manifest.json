@@ -1,0 +1,132 @@
+{
+  "normalizations": {
+    "legacy_tailwind_runtime_removed": []
+  },
+  "project_slug": "daily-win",
+  "route_collisions": [
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/record_daily_achievement/daily_achievement_entry.html",
+      "unregistered_screen_id": "capability_record_daily_achievement_86a57805.screen.main"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/one_entry_per_day_limit/daily_win_entry_screen.html",
+      "unregistered_screen_id": "capability_one_entry_per_day_limit_86f08838.screen.daily_win_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/save_button/main_entry_screen.html",
+      "unregistered_screen_id": "capability_save_button_5553765f.screen.main_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/single_screen_interface/main_recording_screen.html",
+      "unregistered_screen_id": "capability_single_screen_interface_20b1b421.screen.main"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/non_empty_validation/main_entry_screen_with_validation.html",
+      "unregistered_screen_id": "capability_non_empty_validation_c7515c58.screen.main_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/150_character_limit/achievement_entry_screen.html",
+      "unregistered_screen_id": "capability_150_character_limit_2a9520cb.screen.achievement_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/current_date_display/main_entry_screen.html",
+      "unregistered_screen_id": "capability_current_date_display_67c458ab.screen.main_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/duplicate_entry_prevention/main_entry_screen.html",
+      "unregistered_screen_id": "capability_duplicate_entry_prevention_00baa1bc.screen.main_entry"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/confirmation_message/main_screen_with_confirmation_message.html",
+      "unregistered_screen_id": "capability_confirmation_message_23ce028f.screen.main_with_confirmation"
+    },
+    {
+      "registered_path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "registered_screen_id": "capability_local_browser_storage_99d93461.screen.main",
+      "route": "/",
+      "unregistered_path": "frontend/features/brief_microcopy/microcopy_display_screen.html",
+      "unregistered_screen_id": "capability_brief_microcopy_76537cc2.screen.microcopy_display"
+    }
+  ],
+  "runtime_verification": {
+    "errors": [
+      "frontend_package_compile_failed",
+      "frontend_application_boot_failed"
+    ],
+    "valid": false
+  },
+  "schema_version": "frontend-package-manifest-v4",
+  "screen_routes": [
+    {
+      "feature_id": "capability_local_browser_storage_99d93461",
+      "path": "frontend/features/local_browser_storage/main_win_entry_screen.html",
+      "route": "/",
+      "screen_id": "capability_local_browser_storage_99d93461.screen.main"
+    },
+    {
+      "feature_id": "capability_device_timezone_detection_aca07cc7",
+      "path": "frontend/features/device_timezone_detection/timezone_detection_service.html",
+      "route": "/internal/timezone-detection",
+      "screen_id": "capability_device_timezone_detection_aca07cc7.screen.timezone_detection_service"
+    },
+    {
+      "feature_id": "capability_150_character_limit_2a9520cb",
+      "path": "frontend/features/150_character_limit/achievement_confirmation_screen.html",
+      "route": "/confirmation",
+      "screen_id": "capability_150_character_limit_2a9520cb.screen.achievement_confirmation"
+    }
+  ],
+  "source": {
+    "architecture_workspace_id": "60814e7f-ba9b-4027-aedb-e6ee8b2e6869",
+    "backend_package_hash": "92d85aa4de452dfc7b5ec85e52266bd9c1bd3c4e1a5abac27481ee9e36239d82",
+    "backend_package_id": "e8a41add-c305-4b9b-a9bd-b834f47bac5f",
+    "backend_workspace_id": "e96c58ee-23fb-4607-ac5d-13350e4b4141",
+    "feature_hashes": {
+      "capability_150_character_limit_2a9520cb": "94dfcf2044e9e94d42acb9411f4ae622b43b46b5499eb400c83b476f296b7e4d",
+      "capability_brief_microcopy_76537cc2": "2cd3a6e1860442dcbbb47bd6ec9ce6111273c944fdf9b0cfb627d80bee12b611",
+      "capability_confirmation_message_23ce028f": "50aa1ac859ede6cd97116930998d0e4db78389d38c8bc67def243d74371d1feb",
+      "capability_current_date_display_67c458ab": "83344f16ae85abfea81abf04979dcdc8a7196fa19e7161db53a78f29a2ff77b6",
+      "capability_device_timezone_detection_aca07cc7": "f073db2a45a7537e5eee9939620fcaa0bc2255dc8b0425a8e4911de3099ff78d",
+      "capability_duplicate_entry_prevention_00baa1bc": "feb216791e3503c6062bc2ab5dceebaf79bf173cc290a6a04e1c830added7be0",
+      "capability_local_browser_storage_99d93461": "fb8ce025ee9504bbef64bb1d8edc05cebf8967d056b5be5cde62d52c3388d0d0",
+      "capability_non_empty_validation_c7515c58": "b8f2ab3ef51e54eabd57f2c32c500871549ba81c644411b66532ae80735744b4",
+      "capability_one_entry_per_day_limit_86f08838": "b44d13dba2e6095e305674fbf909e69c1700f719dd1202805b0b31559262d8c7",
+      "capability_record_daily_achievement_86a57805": "85f3e790091e31e0ecdb9078ddf7d983eddf2097da4834c716ac6987f9ccdaed",
+      "capability_save_button_5553765f": "7eeac47941c556770cbad43a83fbc1448e712cef292f3c3a3b4aa7f3aa75a6cd",
+      "capability_single_screen_interface_20b1b421": "59876554ab43ac3e541264b6b12c5c0346a950037e4bb97e03989b9d3418f627"
+    },
+    "foundation_hash": "b203da38a9bce731d379b51ccbbe1567f784318c352a3d8eb2205e6133d9c06e",
+    "ui_library": {
+      "compiler_version": "frontend-visual-compiler-v4",
+      "theme": "orange",
+      "version": "zorentia-ui-1"
+    }
+  }
+}
