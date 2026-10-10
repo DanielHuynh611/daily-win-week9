@@ -1,0 +1,13 @@
+{% extends "features/local_browser_storage/main_win_entry_screen.html" %}
+{% block main_content %}
+<header class="z-page-heading"><div><h1>Your wins</h1><p class="z-lead">A little reminder of how far you've come.</p></div></header>
+<section id="win-history" class="z-stack" aria-busy="true" aria-label="Saved wins">
+  <p class="daily-history-summary" id="history-summary" role="status" aria-live="polite">Loading your wins…</p>
+  <p class="z-result-state z-result-state--error daily-status" id="history-error" role="alert" hidden></p>
+  <button class="z-button z-button--secondary" id="history-retry" type="button" hidden>Try again</button>
+  <div class="z-panel" id="history-empty" hidden><div class="z-panel-body z-stack"><h2>Your first win starts here.</h2><p class="z-lead">Record a small achievement today. It will be waiting here whenever you need it.</p><div><a class="z-button z-button--primary" href="/">Record today's win</a></div></div></div>
+  <ol class="daily-history-list" id="history-list" aria-label="Wins, newest first"></ol>
+  <div><button class="z-button z-button--secondary" id="history-more" type="button" hidden>Show more</button></div>
+</section>
+{% endblock %}
+{% block screen_scripts %}<script src="/__frontend_assets/frontend/features/local_browser_storage/history.js" defer></script>{% endblock %}

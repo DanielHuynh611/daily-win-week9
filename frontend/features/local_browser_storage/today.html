@@ -1,0 +1,28 @@
+{% extends "features/local_browser_storage/main_win_entry_screen.html" %}
+{% block main_content %}
+<header class="z-page-heading">
+  <div><h1>Today's win</h1><p class="z-lead">Small achievements count.</p></div>
+</header>
+<section class="z-panel" id="daily-win" aria-busy="true">
+  <div class="z-panel-body z-stack">
+    <time class="daily-date" id="today-date"></time>
+    <p class="z-result-state daily-status" id="win-status" role="status" aria-live="polite">Loading today's win…</p>
+    <p class="z-result-state z-result-state--error daily-status" id="win-error" role="alert" hidden></p>
+    <button class="z-button z-button--secondary" id="retry-load" type="button" hidden>Try again</button>
+    <form class="z-form" id="win-form" hidden>
+      <div class="z-field">
+        <label for="achievement">What is one win from today?</label>
+        <textarea class="z-input" id="achievement" name="achievement_text" rows="3" maxlength="150" required aria-describedby="win-hint win-count" placeholder="I finished a practice question."></textarea>
+        <div class="daily-field-footer"><span id="win-hint">One win per day. Up to 150 characters.</span><span id="win-count">0 / 150</span></div>
+      </div>
+      <div class="z-form-actions"><button class="z-button z-button--primary" id="save-win" type="submit">Save today's win</button></div>
+    </form>
+    <div id="saved-win" class="z-stack" hidden>
+      <p class="daily-saved-text" id="saved-text"></p>
+      <p class="z-lead">Come back tomorrow for your next win.</p>
+      <div><a class="z-button z-button--secondary" href="/history">View your wins</a></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block screen_scripts %}<script src="/__frontend_assets/frontend/features/local_browser_storage/today.js" defer></script>{% endblock %}

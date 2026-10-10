@@ -1,16 +1,15 @@
 """Full-stack Flask entry point for local development and EC2 Gunicorn."""
 from pathlib import Path
 
-from flask import abort, g, render_template, send_file
+from flask import abort, g, redirect, render_template, send_file
 
 from backend import create_app as create_backend_app
 from backend.core.auth import require_auth
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 SCREEN_ROUTES = {
-    "/": "frontend/features/local_browser_storage/main_win_entry_screen.html",
-    "/internal/timezone-detection": "frontend/features/device_timezone_detection/timezone_detection_service.html",
-    "/confirmation": "frontend/features/150_character_limit/achievement_confirmation_screen.html",
+    "/": "frontend/features/local_browser_storage/today.html",
+    "/history": "frontend/features/local_browser_storage/history.html",
 }
 
 
@@ -49,4 +48,11 @@ def create_app(testing=False, config=None):
             return render_template(_template, user=g.user)
 
         app.add_url_rule(route, endpoint=f"frontend_screen_{index}", view_func=serve_screen)
+
+    # Old generated utility pages are now part of the single Today workflow.
+    @app.get("/confirmation")
+    @app.get("/internal/timezone-detection")
+    @require_auth
+    def legacy_screen():
+        return redirect("/")
     return app

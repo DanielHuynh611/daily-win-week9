@@ -1,5 +1,6 @@
 """Behavior checks for real authentication, isolated ownership and durable wins."""
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import re
 
 import pytest
@@ -39,16 +40,21 @@ def headers(client, zone="UTC"):
 
 def save(client, text="Finished a practice question", day=None, zone="UTC"):
     return client.post(API, json={
-        "achievement_text": text, "date": day or date.today().isoformat(),
+        "achievement_text": text, "date": day or datetime.now(ZoneInfo(zone)).date().isoformat(),
     }, headers=headers(client, zone))
 
 
-def test_registration_opens_original_screen_and_hashes_password(app):
+def test_registration_opens_minimal_today_screen_and_hashes_password(app):
     client = app.test_client()
     assert register(client).status_code == 303
     response = client.get("/")
     assert response.status_code == 200
-    assert "Main Win Entry Screen" in response.text
+    assert "Today's win" in response.text
+    assert '<span>Today</span>' in response.text
+    assert 'id="win-form"' in response.text
+    assert "Apply filters" not in response.text
+    assert 'type="date"' not in response.text
+    assert "Timezone Detection Service" not in response.text
     assert "--z-accent:#ff642f" in response.text
     assert 'class="z-sidebar"' in response.text
     assert "student@example.com" in response.text
@@ -137,10 +143,10 @@ def test_150_characters_accepted(app):
 def test_only_current_local_date_allowed(app):
     client = app.test_client()
     register(client)
-    assert save(client, day=(date.today() - timedelta(days=1)).isoformat()).status_code == 400
+    today = datetime.now(ZoneInfo("UTC")).date()
+    assert save(client, day=(today - timedelta(days=1)).isoformat()).status_code == 400
     assert save(client, day="2026-02-30").status_code == 400
-    assert save(client, zone="Not/AZone").status_code == 400
-    from zoneinfo import ZoneInfo
+    assert save(client, day=today.isoformat(), zone="Not/AZone").status_code == 400
     sydney_today = datetime.now(ZoneInfo("Australia/Sydney")).date().isoformat()
     assert save(client, day=sydney_today, zone="Australia/Sydney").status_code == 201
 
@@ -157,7 +163,7 @@ def test_all_generated_save_routes_share_duplicate_constraint(app):
     ]
     for route in routes:
         response = client.post(route, json={
-            "achievement_text": "Duplicate", "date": date.today().isoformat(),
+            "achievement_text": "Duplicate", "date": datetime.now(ZoneInfo("UTC")).date().isoformat(),
         }, headers=headers(client))
         assert response.status_code == 409
 
@@ -223,11 +229,14 @@ def test_persistence_across_application_restart(tmp_path):
     second.extensions["database_engine"].dispose()
 
 
-def test_assets_and_all_original_screen_routes(app):
+def test_assets_and_legacy_screen_redirects(app):
     client = app.test_client()
     register(client)
-    for route in ("/", "/confirmation", "/internal/timezone-detection"):
+    for route in ("/confirmation", "/internal/timezone-detection"):
         response = client.get(route)
+        assert response.status_code == 302
+        assert response.headers["Location"] == "/"
+        response = client.get(route, follow_redirects=True)
         assert response.status_code == 200
         assert 'class="z-sidebar"' in response.text
         assert "--z-accent:#ff642f" in response.text
@@ -236,9 +245,45 @@ def test_assets_and_all_original_screen_routes(app):
         "/__frontend_assets/frontend/shared/ui/library.js",
         "/__frontend_assets/frontend/shared/ui/runtime.js",
         "/__frontend_assets/frontend/features/local_browser_storage/daily_win.js",
+        "/__frontend_assets/frontend/features/local_browser_storage/today.js",
     ):
         assert client.get(route).status_code == 200
     assert client.get("/__frontend_assets/frontend/core/config.py").status_code == 404
+
+
+def test_auth_navigation_does_not_offer_signed_in_workflows(app):
+    client = app.test_client()
+    page = client.get("/login").text
+    assert '<span>Today</span>' not in page
+    assert '<nav' not in page
+    assert 'class="z-sidebar"' not in page
+    assert 'class="daily-auth"' in page
+    assert 'href="/register"' in page
+    assert "Main Win Entry Screen" not in page
+
+
+def test_history_requires_login_and_has_active_navigation(app):
+    client = app.test_client()
+    assert client.get("/history").headers["Location"] == "/login"
+    register(client)
+    response = client.get("/history")
+    assert response.status_code == 200
+    assert 'href="/history" aria-current="page"' in response.text
+    assert 'href="/" aria-current="page"' not in response.text
+    assert 'id="history-empty"' in response.text
+    assert 'id="history-list"' in response.text
+    assert client.get('/__frontend_assets/frontend/features/local_browser_storage/history.js').status_code == 200
+
+
+def test_both_auth_pages_have_no_navigation(app):
+    client = app.test_client()
+    for route in ("/login", "/register"):
+        page = client.get(route).text
+        assert '<nav' not in page
+        assert '<aside' not in page
+        assert 'data-nav-toggle' not in page
+        assert 'id="main-content"' in page
+        assert 'name="csrf_token"' in page
 
 
 def test_secure_cookies_for_https_deployment():
