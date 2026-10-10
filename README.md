@@ -58,10 +58,11 @@ python -m pytest -q
 
 The supplied configurations assume a **separate EC2 instance** and repository
 directory `/home/ubuntu/daily-win-week9`. Install MySQL, Python venv, Git,
-Nginx and Certbot using the deployment guide, then:
+Nginx and Certbot using the deployment guide. Authorize the EC2 SSH key
+for this private GitHub repository, then:
 
 ```bash
-git clone https://github.com/DanielHuynh611/daily-win-week9.git
+git clone git@github.com:DanielHuynh611/daily-win-week9.git
 cd daily-win-week9
 python3 -m venv .venv
 source .venv/bin/activate
