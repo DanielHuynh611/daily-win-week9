@@ -1,0 +1,38 @@
+{% extends "features/local_browser_storage/main_win_entry_screen.html" %}
+{% block main_content %}
+<header class="z-page-heading">
+  <div>
+    <h1>{{ "Create account" if mode == "register" else "Sign in" }}</h1>
+    <p class="z-lead">Save your daily wins privately in your account.</p>
+  </div>
+</header>
+<section class="z-panel">
+  <header class="z-panel-header"><div><h2>{{ "Join Daily Win" if mode == "register" else "Welcome back" }}</h2></div></header>
+  <div class="z-panel-body z-stack">
+    <form class="z-form" method="post" action="/{{ mode }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="z-field">
+        <label for="email">Email <span class="required">*</span></label>
+        <input class="z-input" id="email" name="email" type="email" value="{{ email }}" maxlength="254" autocomplete="email" required>
+      </div>
+      <div class="z-field">
+        <label for="password">Password <span class="required">*</span></label>
+        <input class="z-input" id="password" name="password" type="password" minlength="8" maxlength="128" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" required aria-describedby="password-hint">
+        <small id="password-hint">Use at least 8 characters.</small>
+      </div>
+      {% if mode == "register" %}
+      <div class="z-field">
+        <label for="confirm-password">Confirm password <span class="required">*</span></label>
+        <input class="z-input" id="confirm-password" name="confirm_password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+      </div>
+      {% endif %}
+      {% if error %}<p class="z-result-state z-result-state--error" role="alert">{{ error }}</p>{% endif %}
+      <div class="z-form-actions">
+        <button class="z-button z-button--primary" type="submit">{{ "Create account" if mode == "register" else "Sign in" }}</button>
+        <a class="z-button z-button--secondary" href="{{ '/login' if mode == 'register' else '/register' }}">{{ "Sign in instead" if mode == "register" else "Create account" }}</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+{% block screen_scripts %}{% endblock %}

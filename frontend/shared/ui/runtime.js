@@ -80,7 +80,11 @@
         const indicator = region(root, 'loading'); if (indicator) indicator.hidden = !state;
         all('button,input,textarea,select', root).forEach(node => {
           if (state) { disabledBefore.set(node, node.disabled); node.disabled = true; }
-          else if (disabledBefore.has(node)) { node.disabled = disabledBefore.get(node); disabledBefore.delete(node); }
+          else if (disabledBefore.has(node)) {
+            node.disabled = disabledBefore.get(node);
+            disabledBefore.delete(node);
+            if (node.closest('[data-win-recorded="true"]') && (node.name === 'achievement_text' || node.type === 'submit')) node.disabled = true;
+          }
         });
       }
       function links(scope, values) {
@@ -146,8 +150,9 @@
         const url = materialize(action.route, values);
         const data = Object.fromEntries(Object.entries(values).filter(([key]) => !pathNames.includes(key) && Object.hasOwn(schema.properties || {}, key)));
         const headers = { Accept: 'application/json' }, token = storage.get(config.storage_key);
-        if (action.authentication === 'required' && !token && !window.__ZORENTIA_PREVIEW__) throw Error('Please sign in before using this action.');
-        if (token) headers.Authorization = `Bearer ${token}`;
+        // Authentication is retained in an HttpOnly cookie, including after page reload.
+        headers['X-CSRF-Token'] = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        headers['X-Time-Zone'] = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
         const options = { method: action.method, headers, credentials: 'same-origin' };
         let target = url;
         if (['GET', 'HEAD'].includes(action.method)) {
@@ -157,7 +162,14 @@
         } else { headers['Content-Type'] = 'application/json'; options.body = JSON.stringify(data); }
         const response = await fetch(target, options);
         const payload = response.status === 204 || action.method === 'HEAD' ? {} : await response.json().catch(() => { throw Error('The server returned an unreadable response.'); });
-        if (!response.ok) throw Error(typeof payload.message === 'string' ? payload.message : typeof payload.error === 'string' ? payload.error : `Request failed (${response.status}).`);
+        if (response.status === 401 && !window.__ZORENTIA_PREVIEW__) {
+          location.assign('/login');
+          throw Error('Please sign in to continue.');
+        }
+        if (!response.ok) {
+          document.dispatchEvent(new CustomEvent('dailywin:error', { detail: { payload, status: response.status, action } }));
+          throw Error(typeof payload.message === 'string' ? payload.message : typeof payload.error === 'string' ? payload.error : `Request failed (${response.status}).`);
+        }
         return payload;
       }
       async function execute(root, action, prefill = false) {
@@ -184,7 +196,8 @@
               if (!window.__ZORENTIA_PREVIEW__ && !storage.set(config.storage_key, token)) throw Error('Browser storage is unavailable. Sign-in could not be retained.');
             }
             render(root, payload);
-            show(root, 'success', ['GET', 'HEAD'].includes(action.method) ? 'Loaded.' : action.token_path ? 'Signed in.' : 'Changes saved.');
+            show(root, 'success', ['GET', 'HEAD'].includes(action.method) ? 'Loaded.' : action.token_path ? 'Signed in.' : "Today's win saved!");
+            document.dispatchEvent(new CustomEvent('dailywin:response', { detail: { root, payload, action } }));
             if (action.success_route && !window.__ZORENTIA_PREVIEW__) location.assign(materialize(action.success_route, { ...values, ...payload }));
           }
         } catch (error) { show(root, 'error', error.message || 'Something went wrong. Please try again.'); }

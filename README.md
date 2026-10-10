@@ -1,42 +1,118 @@
-# daily-win backend
+# Daily Win
 
-This backend was assembled from your completed feature implementations by
-Zorentia Backend Generator.
+Week 9 Zorentia application. Flask, vanilla JavaScript and SQLAlchemy Core/MySQL.
+The original generated screens, orange/dark styling and sidebar are retained.
+Register an email and password (8–128 characters), then save one win of up to
+150 characters per local calendar day. Records belong to your account.
 
-Follow the setup instructions below. If you encounter an error while setting up
-or running the project, copy the error message into Goat Helper for step-by-step help.
+## Run locally
 
-## Setup
+From the project directory:
 
-1. Create a virtual environment: `python -m venv .venv`
-2. Activate it.
-3. Install dependencies: `pip install -r requirements.txt`
-4. Copy `.env.example` to `.env` and replace the example values.
-5. Connect to the MySQL database prepared in Database Designer and confirm its
-   generated tables are present. Apply `database/schema.sql` once only when
-   setting up a new empty database.
-6. Run tests: `pytest -q`
-7. Start the application:
-   `flask --app 'backend:create_app()' run --debug`
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+openssl rand -hex 32
+```
 
-The generated API health endpoint is `GET /health`.
+Create a dedicated MySQL database and user. For example, run these statements
+inside the MySQL client as an administrator, replacing the password:
 
-## Understand this codebase
+```sql
+CREATE DATABASE daily_win CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'dailywin'@'localhost' IDENTIFIED BY 'YOUR_DATABASE_PASSWORD';
+GRANT ALL PRIVILEGES ON daily_win.* TO 'dailywin'@'localhost';
+```
 
-- `backend/app.py` creates the Flask application and registers the feature routes.
-- `backend/features/` contains each feature's handlers and application logic.
-- `backend/core/` contains shared database access, authentication, errors and configuration.
-- `database/schema.sql` defines the MySQL tables used by those handlers.
-- `tests/` contains generated checks. Run them locally; their presence does not mean
-  they were executed or that every business scenario is covered.
+Edit `.env`:
 
-API requests reach a registered feature handler, which uses the shared database
-helpers to read or update MySQL. Configure the connection in `.env` before use.
-Do not reapply the schema to a database that already contains the generated tables.
-For a full-stack package, use `README-FULLSTACK.md` for the frontend entry point.
+```dotenv
+DATABASE_URL=mysql+mysqlconnector://dailywin:YOUR_DATABASE_PASSWORD@localhost:3306/daily_win
+JWT_SECRET=PASTE_THE_RANDOM_VALUE_FROM_OPENSSL
+JWT_ISSUER=zorentia-app
+COOKIE_SECURE=false
+```
 
-## Verification results
+URL-encode special characters in the database password when placing it in
+`DATABASE_URL`. Then:
 
-Open [VERIFICATION.md](VERIFICATION.md) for stage reports, recorded findings,
-file/feature identifiers, debugging evidence and checks that were not run.
-Failed earlier attempts are documented separately from checks on packaged files.
+```bash
+flask --app 'fullstack:create_app()' init-db
+flask --app 'fullstack:create_app()' run --debug
+```
+
+Open http://127.0.0.1:5000/register. MySQL stores accounts and wins persistently.
+`init-db` creates missing tables and preserves existing records. It is not a
+migration for an already deployed copy of the original generated schema.
+Use a fresh database for this repaired version.
+
+Tests use isolated SQLite databases, including a file-backed restart check:
+
+```bash
+python -m pytest -q
+```
+
+## AWS EC2
+
+The supplied configurations assume a **separate EC2 instance** and repository
+directory `/home/ubuntu/daily-win-week9`. Install MySQL, Python venv, Git,
+Nginx and Certbot using the deployment guide, then:
+
+```bash
+git clone https://github.com/DanielHuynh611/daily-win-week9.git
+cd daily-win-week9
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+nano .env
+chmod 600 .env
+```
+
+Create the dedicated MySQL database/user as above. Set the real database
+credentials, a random `JWT_SECRET`, and `COOKIE_SECURE=true` in `.env`.
+A secure cookie requires HTTPS; use `false` only for local or temporary HTTP testing.
+
+```bash
+flask --app 'fullstack:create_app()' init-db
+flask --app 'fullstack:create_app()' routes
+python -m pytest -q
+sudo cp deploy/daily-win.service /etc/systemd/system/daily-win.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now daily-win
+curl http://127.0.0.1:8000/health
+sudo cp deploy/nginx.conf /etc/nginx/sites-available/daily-win
+sudo ln -s /etc/nginx/sites-available/daily-win /etc/nginx/sites-enabled/daily-win
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+In Namecheap add an A record with Host `daily-win`, Value equal to the new
+instance's Elastic IP, and TTL Automatic. Keep the existing `@` and `www`
+records and existing application intact. Allow HTTP/HTTPS in the security group.
+After the subdomain resolves to the instance:
+
+```bash
+sudo certbot --nginx -d daily-win.track-my-habit.me
+curl https://daily-win.track-my-habit.me/health
+sudo certbot renew --dry-run
+```
+
+Test registration, saving, refreshing and signing back in at the public HTTPS URL.
+For another hostname or repository directory, update the supplied deployment
+files before installing them. If sharing an EC2 instance, give the new app a
+separate database, systemd/Nginx configuration and a free Gunicorn port.
+
+To update this app later:
+
+```bash
+cd /home/ubuntu/daily-win-week9
+git pull --ff-only origin main
+source .venv/bin/activate
+pip install -r requirements.txt
+sudo systemctl restart daily-win
+sudo systemctl status daily-win --no-pager
+curl https://daily-win.track-my-habit.me/health
+```
